@@ -21,6 +21,7 @@ import { Strings } from '../../main-thread/strings';
 import { TransferrableMutationType } from '../../transfer/TransferrableMutation';
 import { NumericBoolean } from '../../utils';
 import { CommandExecutor } from '../../main-thread/commands/interface';
+import { serialize } from '../../worker-thread/global-id';
 
 let sandbox: sinon.SinonSandbox;
 
@@ -228,12 +229,10 @@ function exectuteCall(
     new Uint16Array([
       TransferrableMutationType.OFFSCREEN_POLYFILL,
       canvasElement._index_,
-      float32Needed ? NumericBoolean.TRUE : NumericBoolean.FALSE,
       args.length,
       storeString(strings, fnName, stringsIndex),
       isSetter ? NumericBoolean.TRUE : NumericBoolean.FALSE,
-      stringArgIndex,
-      ...(float32Needed ? new Uint16Array(new Float32Array(args).buffer) : args),
+      ...serialize(args),
     ]),
     0,
     canvasElement,

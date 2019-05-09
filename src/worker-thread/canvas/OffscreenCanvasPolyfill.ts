@@ -15,6 +15,7 @@ import { Document } from '../dom/Document';
 import { NumericBoolean } from '../../utils';
 import { store } from '../strings';
 import { HTMLElement } from '../dom/HTMLElement';
+import { serialize } from '../global-id';
 
 export class OffscreenCanvasPolyfill<ElementType extends HTMLElement> {
   canvas: ElementType;
@@ -45,16 +46,14 @@ class OffscreenCanvasRenderingContext2DPolyfill<ElementType extends HTMLElement>
     this.lineDash = [];
   }
 
-  private postToMainThread(fnName: string, isSetter: NumericBoolean, stringArgIndex: number, args: any[], float32Needed: boolean) {
+  private postToMainThread(fnName: string, isSetter: NumericBoolean, args: unknown[]) {
     transfer(this.canvasElement.ownerDocument as Document, [
       TransferrableMutationType.OFFSCREEN_POLYFILL,
       this.canvasElement[TransferrableKeys.index],
-      float32Needed ? NumericBoolean.TRUE : NumericBoolean.FALSE,
       args.length,
       store(fnName),
       isSetter,
-      stringArgIndex,
-      ...(float32Needed ? new Uint16Array(new Float32Array(args).buffer) : args),
+      ...serialize(args),
     ]);
   }
 
@@ -63,177 +62,175 @@ class OffscreenCanvasRenderingContext2DPolyfill<ElementType extends HTMLElement>
   }
 
   clearRect(x: number, y: number, w: number, h: number): void {
-    this.postToMainThread('clearRect', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('clearRect', NumericBoolean.FALSE, [...arguments]);
   }
 
   fillRect(x: number, y: number, w: number, h: number): void {
-    this.postToMainThread('fillRect', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('fillRect', NumericBoolean.FALSE, [...arguments]);
   }
 
   strokeRect(x: number, y: number, w: number, h: number): void {
-    this.postToMainThread('strokeRect', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('strokeRect', NumericBoolean.FALSE, [...arguments]);
   }
 
   set lineWidth(value: number) {
-    this.postToMainThread('lineWidth', NumericBoolean.TRUE, 0, [...arguments], true);
+    this.postToMainThread('lineWidth', NumericBoolean.TRUE, [...arguments]);
   }
 
   fillText(text: string, x: number, y: number, maxWidth?: number) {
-    const numberArgs = [...arguments].slice(1);
-    this.postToMainThread('fillText', NumericBoolean.FALSE, 1, [store(text), ...numberArgs], true);
+    this.postToMainThread('fillText', NumericBoolean.FALSE, [...arguments]);
   }
 
   moveTo(x: number, y: number) {
-    this.postToMainThread('moveTo', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('moveTo', NumericBoolean.FALSE, [...arguments]);
   }
 
   lineTo(x: number, y: number) {
-    this.postToMainThread('lineTo', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('lineTo', NumericBoolean.FALSE, [...arguments]);
   }
 
   closePath() {
-    this.postToMainThread('closePath', NumericBoolean.FALSE, 0, [], false);
+    this.postToMainThread('closePath', NumericBoolean.FALSE, []);
   }
 
   stroke() {
-    this.postToMainThread('stroke', NumericBoolean.FALSE, 0, [], false);
+    this.postToMainThread('stroke', NumericBoolean.FALSE, []);
   }
 
   restore() {
-    this.postToMainThread('restore', NumericBoolean.FALSE, 0, [], false);
+    this.postToMainThread('restore', NumericBoolean.FALSE, []);
   }
 
   save() {
-    this.postToMainThread('save', NumericBoolean.FALSE, 0, [], false);
+    this.postToMainThread('save', NumericBoolean.FALSE, []);
   }
 
   resetTransform() {
-    this.postToMainThread('resetTransform', NumericBoolean.FALSE, 0, [], false);
+    this.postToMainThread('resetTransform', NumericBoolean.FALSE, []);
   }
 
   rotate(angle: number) {
-    this.postToMainThread('rotate', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('rotate', NumericBoolean.FALSE, [...arguments]);
   }
 
   transform(a: number, b: number, c: number, d: number, e: number, f: number) {
-    this.postToMainThread('transform', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('transform', NumericBoolean.FALSE, [...arguments]);
   }
 
   translate(x: number, y: number) {
-    this.postToMainThread('translate', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('translate', NumericBoolean.FALSE, [...arguments]);
   }
 
   scale(x: number, y: number) {
-    this.postToMainThread('scale', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('scale', NumericBoolean.FALSE, [...arguments]);
   }
 
   set globalAlpha(value: number) {
-    this.postToMainThread('globalAlpha', NumericBoolean.TRUE, 0, [...arguments], true);
+    this.postToMainThread('globalAlpha', NumericBoolean.TRUE, [...arguments]);
   }
 
   set globalCompositeOperation(value: string) {
-    this.postToMainThread('globalCompositeOperation', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('globalCompositeOperation', NumericBoolean.TRUE, [...arguments]);
   }
 
   set imageSmoothingQuality(value: ImageSmoothingQuality) {
-    this.postToMainThread('imageSmoothingQuality', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('imageSmoothingQuality', NumericBoolean.TRUE, [...arguments]);
   }
 
   set fillStyle(value: string) {
-    this.postToMainThread('fillStyle', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('fillStyle', NumericBoolean.TRUE, [...arguments]);
   }
 
   set strokeStyle(value: string) {
-    this.postToMainThread('strokeStyle', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('strokeStyle', NumericBoolean.TRUE, [...arguments]);
   }
 
   set shadowBlur(value: number) {
-    this.postToMainThread('shadowBlur', NumericBoolean.TRUE, 0, [...arguments], true);
+    this.postToMainThread('shadowBlur', NumericBoolean.TRUE, [...arguments]);
   }
 
   set shadowColor(value: string) {
-    this.postToMainThread('shadowColor', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('shadowColor', NumericBoolean.TRUE, [...arguments]);
   }
 
   set shadowOffsetX(value: number) {
-    this.postToMainThread('shadowOffsetX', NumericBoolean.TRUE, 0, [...arguments], true);
+    this.postToMainThread('shadowOffsetX', NumericBoolean.TRUE, [...arguments]);
   }
 
   set shadowOffsetY(value: number) {
-    this.postToMainThread('shadowOffsetY', NumericBoolean.TRUE, 0, [...arguments], true);
+    this.postToMainThread('shadowOffsetY', NumericBoolean.TRUE, [...arguments]);
   }
 
   set filter(value: string) {
-    this.postToMainThread('filter', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('filter', NumericBoolean.TRUE, [...arguments]);
   }
 
   beginPath() {
-    this.postToMainThread('beginPath', NumericBoolean.FALSE, 0, [], false);
+    this.postToMainThread('beginPath', NumericBoolean.FALSE, []);
   }
 
   strokeText(text: string, x: number, y: number, maxWidth?: number) {
-    const numberArgs = [...arguments].slice(1);
-    this.postToMainThread('strokeText', NumericBoolean.FALSE, 1, [store(text), ...numberArgs], true);
+    this.postToMainThread('strokeText', NumericBoolean.FALSE, [...arguments]);
   }
 
   set textAlign(value: CanvasTextAlign) {
-    this.postToMainThread('textAlign', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('textAlign', NumericBoolean.TRUE, [...arguments]);
   }
 
   set textBaseline(value: CanvasTextBaseline) {
-    this.postToMainThread('textBaseline', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('textBaseline', NumericBoolean.TRUE, [...arguments]);
   }
 
   set lineCap(value: CanvasLineCap) {
-    this.postToMainThread('lineCap', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('lineCap', NumericBoolean.TRUE, [...arguments]);
   }
 
   set lineDashOffset(value: number) {
-    this.postToMainThread('lineDashOffset', NumericBoolean.TRUE, 0, [...arguments], true);
+    this.postToMainThread('lineDashOffset', NumericBoolean.TRUE, [...arguments]);
   }
 
   set lineJoin(value: CanvasLineJoin) {
-    this.postToMainThread('lineJoin', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('lineJoin', NumericBoolean.TRUE, [...arguments]);
   }
 
   set miterLimit(value: number) {
-    this.postToMainThread('miterLimit', NumericBoolean.TRUE, 0, [...arguments], true);
+    this.postToMainThread('miterLimit', NumericBoolean.TRUE, [...arguments]);
   }
 
   arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: boolean) {
-    this.postToMainThread('arc', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('arc', NumericBoolean.FALSE, [...arguments]);
   }
 
   arcTo(x1: number, y1: number, x2: number, y2: number, radius: number) {
-    this.postToMainThread('arcTo', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('arcTo', NumericBoolean.FALSE, [...arguments]);
   }
 
   set direction(value: CanvasDirection) {
-    this.postToMainThread('direction', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('direction', NumericBoolean.TRUE, [...arguments]);
   }
 
   set font(value: string) {
-    this.postToMainThread('font', NumericBoolean.TRUE, 1, [store(value)], false);
+    this.postToMainThread('font', NumericBoolean.TRUE, [...arguments]);
   }
 
   ellipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number, anticlockwise?: boolean) {
-    this.postToMainThread('ellipse', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('ellipse', NumericBoolean.FALSE, [...arguments]);
   }
 
   bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number) {
-    this.postToMainThread('bezierCurveTo', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('bezierCurveTo', NumericBoolean.FALSE, [...arguments]);
   }
 
   rect(x: number, y: number, width: number, height: number) {
-    this.postToMainThread('rect', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('rect', NumericBoolean.FALSE, [...arguments]);
   }
 
   quadraticCurveTo(cpx: number, cpy: number, x: number, y: number) {
-    this.postToMainThread('quadraticCurveTo', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('quadraticCurveTo', NumericBoolean.FALSE, [...arguments]);
   }
 
   set imageSmoothingEnabled(value: boolean) {
-    this.postToMainThread('imageSmoothingEnabled', NumericBoolean.TRUE, 0, [...arguments], false);
+    this.postToMainThread('imageSmoothingEnabled', NumericBoolean.TRUE, [...arguments]);
   }
 
   setLineDash(lineDash: number[]) {
@@ -242,7 +239,7 @@ class OffscreenCanvasRenderingContext2DPolyfill<ElementType extends HTMLElement>
       lineDash = lineDash.concat(lineDash);
     }
     this.lineDash = lineDash;
-    this.postToMainThread('setLineDash', NumericBoolean.FALSE, 0, lineDash, true);
+    this.postToMainThread('setLineDash', NumericBoolean.FALSE, lineDash);
   }
 
   getLineDash(): number[] {
@@ -253,14 +250,14 @@ class OffscreenCanvasRenderingContext2DPolyfill<ElementType extends HTMLElement>
     if (typeof pathOrFillRule === 'object') {
       throw new Error('clip(Path2D) is currently not supported!');
     }
-    this.postToMainThread('clip', NumericBoolean.FALSE, 1, [...arguments], false);
+    this.postToMainThread('clip', NumericBoolean.FALSE, [...arguments]);
   }
 
   fill(pathOrFillRule?: Path2D | CanvasFillRule, fillRule?: CanvasFillRule) {
     if (typeof pathOrFillRule === 'object') {
       throw new Error('fill(Path2D) is currently not supported!');
     }
-    this.postToMainThread('fill', NumericBoolean.FALSE, 1, [...arguments], false);
+    this.postToMainThread('fill', NumericBoolean.FALSE, [...arguments]);
   }
 
   // Method has a different signature in MDN than it does in HTML spec
@@ -268,7 +265,7 @@ class OffscreenCanvasRenderingContext2DPolyfill<ElementType extends HTMLElement>
     if (typeof transformOrA === 'object') {
       throw new Error('setTransform(DOMMatrix2DInit) is currently not supported!');
     }
-    this.postToMainThread('setTransform', NumericBoolean.FALSE, 0, [...arguments], true);
+    this.postToMainThread('setTransform', NumericBoolean.FALSE, [...arguments]);
   }
 
   ////////////////////////////////////////
